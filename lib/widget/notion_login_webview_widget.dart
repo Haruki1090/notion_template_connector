@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/notion_oauth_api.dart';
-import '../env/env.dart';
 import '../provider/notion_auth_provider.dart';
 
 class NotionLoginWebviewWidget extends ConsumerStatefulWidget {
@@ -18,17 +18,19 @@ class NotionLoginWebviewWidget extends ConsumerStatefulWidget {
 
 class _NotionLoginWebviewWidgetState
     extends ConsumerState<NotionLoginWebviewWidget> {
-  InAppWebViewController? _webViewController;
   // カスタムURLスキーム（例: "notionsample"）
   final String customScheme = "notionsample";
 
   @override
   Widget build(BuildContext context) {
+    // dotenvから認証URLを取得
+    final authUrl = dotenv.env['NOTION_AUTH_URL'] ?? '';
+
     return Scaffold(
       appBar: AppBar(title: const Text('Notion Login')),
       body: InAppWebView(
         initialUrlRequest:
-            URLRequest(url: WebUri(Uri.parse(Env.authUrl).toString())),
+            URLRequest(url: WebUri(Uri.parse(authUrl).toString())),
         initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
             useShouldOverrideUrlLoading: true,
@@ -42,13 +44,11 @@ class _NotionLoginWebviewWidgetState
             disableDefaultErrorPage: true,
           ),
         ),
-        onWebViewCreated: (controller) {
-          _webViewController = controller;
-        },
+        onWebViewCreated: (controller) {},
         shouldOverrideUrlLoading: (controller, navigationAction) async {
           final uri = navigationAction.request.url;
           if (uri != null && uri.scheme == customScheme) {
-            // カスタムURLスキームによるdeeplink受信
+            // カスタムURLスキームによる deeplink 受信
             final code = uri.queryParameters['code'];
             if (code != null) {
               // 認可コードをアクセストークンに交換する
