@@ -25,12 +25,14 @@ class NotionTemplateConnectorApp extends ConsumerWidget {
         ),
         body: Center(
           child: token == null
-              ? ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => const NotionLoginWebviewWidget()));
-                  },
-                  child: const Text('Notionと連携する'),
+              ? Builder(
+                  builder: (context) => ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => const NotionLoginWebviewWidget()));
+                    },
+                    child: const Text('Notionと連携する'),
+                  ),
                 )
               : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
