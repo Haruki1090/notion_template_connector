@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'provider/notion_auth_provider.dart';
 import 'widget/notion_login_webview_widget.dart';
 
-void main() {
+Future<void> main() async {
+  // Flutter の初期化前に dotenv をロード
+  await dotenv.load(fileName: ".env");
   runApp(const ProviderScope(child: NotionTemplateConnectorApp()));
 }
 
 class NotionTemplateConnectorApp extends ConsumerWidget {
-  const NotionTemplateConnectorApp({super.key});
+  const NotionTemplateConnectorApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,14 +25,12 @@ class NotionTemplateConnectorApp extends ConsumerWidget {
         ),
         body: Center(
           child: token == null
-              ? Builder(
-                  builder: (context) => ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => const NotionLoginWebviewWidget()));
-                    },
-                    child: const Text('Notionと連携する'),
-                  ),
+              ? ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => const NotionLoginWebviewWidget()));
+                  },
+                  child: const Text('Notionと連携する'),
                 )
               : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
