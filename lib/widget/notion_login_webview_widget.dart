@@ -18,7 +18,6 @@ class NotionLoginWebviewWidget extends ConsumerStatefulWidget {
 
 class _NotionLoginWebviewWidgetState
     extends ConsumerState<NotionLoginWebviewWidget> {
-  InAppWebViewController? _webViewController;
   // カスタムURLスキーム（例: "notionsample"）
   final String customScheme = "notionsample";
 
@@ -27,7 +26,7 @@ class _NotionLoginWebviewWidgetState
     return Scaffold(
       appBar: AppBar(title: const Text('Notion Login')),
       body: InAppWebView(
-        initialUrlRequest: URLRequest(url: Uri.parse(Env.authUrl)),
+        initialUrlRequest: URLRequest(url: WebUri((Env.authUrl).toString())),
         initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
             useShouldOverrideUrlLoading: true,
@@ -40,9 +39,7 @@ class _NotionLoginWebviewWidgetState
             disableDefaultErrorPage: true,
           ),
         ),
-        onWebViewCreated: (controller) {
-          _webViewController = controller;
-        },
+        onWebViewCreated: (controller) {},
         shouldOverrideUrlLoading: (controller, navigationAction) async {
           final uri = navigationAction.request.url;
           if (uri != null && uri.scheme == customScheme) {
