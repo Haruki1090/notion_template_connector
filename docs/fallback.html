@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Notion OAuth Redirect</title>
+</head>
+<body>
+<script>
+    // URLパラメータから code と duplicated_template_id を抽出
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const duplicatedTemplateId = params.get('duplicated_template_id');
+
+    if (code) {
+      // 通常の認証コードが存在する場合
+      window.location.href = 'notionsample://oauth/callback?code=' + code;
+    } else if (duplicatedTemplateId) {
+      // テンプレート複製用パラメータがある場合
+      window.location.href = 'notionsample://oauth/callback?duplicated_template_id=' + duplicatedTemplateId;
+    } else {
+      // 両方とも存在しない場合はエラー表示
+      document.body.innerHTML = '<h1>認証コードの取得に失敗しました</h1><p>再度お試しください。</p>';
+    }
+</script>
+</body>
+</html>
