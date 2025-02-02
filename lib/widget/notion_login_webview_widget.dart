@@ -9,7 +9,7 @@ import '../api/notion_oauth_api.dart';
 import '../provider/notion_auth_provider.dart';
 
 class NotionLoginWebviewWidget extends ConsumerStatefulWidget {
-  const NotionLoginWebviewWidget({Key? key}) : super(key: key);
+  const NotionLoginWebviewWidget({super.key});
 
   @override
   ConsumerState<NotionLoginWebviewWidget> createState() =>

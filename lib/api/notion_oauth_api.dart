@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -33,7 +34,9 @@ class NotionOAuthApi {
       final data = jsonDecode(response.body);
       return data['access_token'];
     } else {
-      print("アクセストークン取得エラー: ${response.body}");
+      if (kDebugMode) {
+        print("アクセストークン取得エラー: ${response.body}");
+      }
       return null;
     }
   }
