@@ -1,14 +1,18 @@
 import 'dart:convert';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
-import '../env/env.dart';
-
 class NotionOAuthApi {
-  // 認可コード(code)をアクセストークンに変換する
+  // 認可コード(code)をアクセストークンに変換するメソッド
   static Future<String?> exchangeCodeForToken(String code) async {
     final url = Uri.parse("https://api.notion.com/v1/oauth/token");
-    final authCredentials = '${Env.clientId}:${Env.clientSecret}';
+    // dotenvから値を取得
+    final clientId = dotenv.env['OAUTH_CLIENT_ID'] ?? '';
+    final clientSecret = dotenv.env['OAUTH_CLIENT_SECRET'] ?? '';
+    final redirectUri = dotenv.env['NOTION_REDIRECT_URI'] ?? '';
+
+    final authCredentials = '$clientId:$clientSecret';
     final encodedCredentials = base64Encode(utf8.encode(authCredentials));
 
     final headers = {
@@ -20,7 +24,7 @@ class NotionOAuthApi {
     final body = jsonEncode({
       'grant_type': 'authorization_code',
       'code': code,
-      'redirect_uri': Env.redirectUri,
+      'redirect_uri': redirectUri,
     });
 
     final response = await http.post(url, headers: headers, body: body);
