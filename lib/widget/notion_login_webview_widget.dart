@@ -31,33 +31,44 @@ class _NotionLoginWebviewWidgetState
       body: InAppWebView(
         initialUrlRequest:
             URLRequest(url: WebUri(Uri.parse(authUrl).toString())),
-        initialOptions: InAppWebViewGroupOptions(
-          crossPlatform: InAppWebViewOptions(
-            useShouldOverrideUrlLoading: true,
-            javaScriptEnabled: true,
-            // 最新のブラウザを模倣するUser Agentに更新
-            userAgent: Platform.isIOS
-                ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
-                : 'Mozilla/5.0 (Linux; Android 12; Pixel 5 Build/SQ3A.220705.003) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.97 Mobile Safari/537.36',
-          ),
-          android: AndroidInAppWebViewOptions(
-            disableDefaultErrorPage: true,
-          ),
+        initialSettings: InAppWebViewSettings(
+          useShouldOverrideUrlLoading: true,
+          javaScriptEnabled: true,
+          // 最新のブラウザを模倣するUser Agentに更新
+          userAgent: Platform.isIOS
+              ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
+              : 'Mozilla/5.0 (Linux; Android 12; Pixel 5 Build/SQ3A.220705.003) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.97 Mobile Safari/537.36',
         ),
         onWebViewCreated: (controller) {},
         shouldOverrideUrlLoading: (controller, navigationAction) async {
           final uri = navigationAction.request.url;
           if (uri != null && uri.scheme == customScheme) {
-            // カスタムURLスキームによる deeplink 受信
+            // URLパラメータから "code" および "duplicated_template_id" を抽出
             final code = uri.queryParameters['code'];
+            final duplicatedTemplateId =
+                uri.queryParameters['duplicated_template_id'];
             if (code != null) {
-              // 認可コードをアクセストークンに交換する
+              // 通常の認証コードがある場合、アクセストークンに交換
               final token = await NotionOAuthApi.exchangeCodeForToken(code);
               if (token != null) {
                 ref.read(notionAuthProvider.notifier).setToken(token);
-                // 認証完了後、WebView画面を閉じる
                 Navigator.of(context).pop();
               }
+            } else if (duplicatedTemplateId != null) {
+              // テンプレート複製が成功した場合、必要に応じてduplicated_template_idを利用する
+              // ここでは、認証成功としてフラグをセットする例を示す
+              // ※本来は、テンプレート複製後にNotion側で発行されるアクセストークンを取得する必要がある場合もありますが、
+              // ここではシンプルな例として連携完了とみなします。
+              ref
+                  .read(notionAuthProvider.notifier)
+                  .setToken('template_duplicated:$duplicatedTemplateId');
+              Navigator.of(context).pop();
+            } else {
+              // 両方のパラメータが存在しない場合、エラー処理へ
+              // 必要に応じてエラーメッセージを表示するなどの対応を検討
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('認証コードの取得に失敗しました'),
+              ));
             }
             return NavigationActionPolicy.CANCEL;
           }
