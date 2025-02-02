@@ -12,7 +12,7 @@ Future<void> main() async {
 }
 
 class NotionTemplateConnectorApp extends ConsumerWidget {
-  const NotionTemplateConnectorApp({Key? key}) : super(key: key);
+  const NotionTemplateConnectorApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
