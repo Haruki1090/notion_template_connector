@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Notion OAuth Redirect</title>
+</head>
+<body>
+<script>
+    // URLパラメータから code を抽出
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (code) {
+      // Flutterアプリ側のカスタムURLスキームへリダイレクト（例: notionsample://oauth/callback?code=...）
+      window.location.href = 'notionsample://oauth/callback?code=' + code;
+    } else {
+      window.location.href = 'fallback.html';
+    }
+</script>
+</body>
+</html>
