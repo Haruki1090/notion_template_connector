@@ -11,11 +11,13 @@ Future<void> main() async {
   runApp(const ProviderScope(child: NotionTemplateConnectorApp()));
 }
 
+// アプリ全体のウィジェット
 class NotionTemplateConnectorApp extends ConsumerWidget {
   const NotionTemplateConnectorApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // notionAuthProvider を監視し、アクセストークンが保存されているか（連携済みか）を確認する
     final token = ref.watch(notionAuthProvider);
     return MaterialApp(
       title: 'Notion Template Connector',
